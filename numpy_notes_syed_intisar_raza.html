@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NumPy Study Notes – Syed Intisar Raza</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f1a;
+    --surface: #161928;
+    --card: #1e2236;
+    --border: #2a2f4a;
+    --accent: #5b8dee;
+    --accent2: #ff6b6b;
+    --accent3: #43e8b0;
+    --accent4: #f9c846;
+    --text: #e8ecf5;
+    --muted: #8892aa;
+    --code-bg: #0a0c14;
+    --gradient1: linear-gradient(135deg, #5b8dee22, #43e8b022);
+    --gradient2: linear-gradient(135deg, #ff6b6b22, #f9c84622);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Sora', sans-serif;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ---- HERO ---- */
+  .hero {
+    background: radial-gradient(ellipse at 30% 50%, #1a2a6c44 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, #5b8dee22 0%, transparent 50%),
+                var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 40px 50px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(#5b8dee18 1px, transparent 1px);
+    background-size: 28px 28px;
+    pointer-events: none;
+  }
+
+  .badge {
+    display: inline-block;
+    background: linear-gradient(90deg, var(--accent), var(--accent3));
+    color: #000;
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 18px;
+  }
+
+  .hero h1 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -1px;
+    margin-bottom: 10px;
+  }
+
+  .hero h1 span { color: var(--accent); }
+
+  .hero p {
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin-top: 12px;
+  }
+
+  .author-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 30px;
+    padding: 8px 20px;
+    margin-top: 20px;
+    font-size: 0.85rem;
+    color: var(--accent3);
+    font-weight: 600;
+  }
+
+  /* ---- TOC ---- */
+  .toc-container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 20px;
+  }
+
+  .toc {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    border-radius: 12px;
+    padding: 28px 32px;
+  }
+
+  .toc h2 { font-size: 1rem; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 16px; }
+
+  .toc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 8px;
+  }
+
+  .toc a {
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .toc a:hover { background: var(--surface); color: var(--accent); }
+  .toc a .num { color: var(--accent); font-family: 'Space Mono', monospace; font-size: 0.75rem; }
+
+  /* ---- MAIN ---- */
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 20px 80px;
+  }
+
+  /* ---- SECTION ---- */
+  .section {
+    margin-bottom: 48px;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+  }
+
+  .icon-blue { background: #5b8dee22; border: 1px solid #5b8dee55; }
+  .icon-red { background: #ff6b6b22; border: 1px solid #ff6b6b55; }
+  .icon-green { background: #43e8b022; border: 1px solid #43e8b055; }
+  .icon-yellow { background: #f9c84622; border: 1px solid #f9c84655; }
+  .icon-purple { background: #c77dff22; border: 1px solid #c77dff55; }
+  .icon-pink { background: #f72585aa; border: 1px solid #f7258555; }
+
+  .section-title { font-size: 1.4rem; font-weight: 700; }
+  .section-num { font-family: 'Space Mono', monospace; color: var(--muted); font-size: 0.75rem; }
+
+  /* ---- CARDS ---- */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px 24px;
+    margin-bottom: 14px;
+    transition: border-color 0.2s, transform 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: var(--accent);
+    border-radius: 3px 0 0 3px;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .card:hover::before { opacity: 1; }
+
+  .card-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+    color: var(--accent3);
+  }
+
+  .card p { font-size: 0.9rem; color: var(--muted); line-height: 1.7; }
+  .card p strong { color: var(--text); }
+
+  /* ---- CODE ---- */
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 14px 0;
+  }
+
+  .code-header {
+    background: #151720;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .code-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; font-family: 'Space Mono', monospace; }
+
+  .code-dots { display: flex; gap: 6px; }
+  .code-dots span {
+    width: 10px; height: 10px; border-radius: 50%;
+  }
+  .dot-r { background: #ff6b6b; }
+  .dot-y { background: #f9c846; }
+  .dot-g { background: #43e8b0; }
+
+  pre {
+    padding: 18px 20px;
+    overflow-x: auto;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.82rem;
+    line-height: 1.7;
+    color: #c8d0e7;
+  }
+
+  .kw { color: #5b8dee; }
+  .fn { color: #43e8b0; }
+  .str { color: #f9c846; }
+  .cm { color: #555e7a; font-style: italic; }
+  .num-c { color: #ff6b6b; }
+  .out { color: #8892aa; }
+
+  /* ---- HIGHLIGHT BOXES ---- */
+  .tip-box {
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 14px 0;
+    font-size: 0.88rem;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .tip-box .icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 2px; }
+
+  .tip-blue { background: #5b8dee15; border: 1px solid #5b8dee40; }
+  .tip-yellow { background: #f9c84615; border: 1px solid #f9c84640; }
+  .tip-green { background: #43e8b015; border: 1px solid #43e8b040; }
+  .tip-red { background: #ff6b6b15; border: 1px solid #ff6b6b40; }
+
+  /* ---- COMPARE TABLE ---- */
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.87rem;
+    margin: 14px 0;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .compare-table th {
+    background: var(--surface);
+    color: var(--accent);
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .compare-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--card);
+    color: var(--muted);
+  }
+
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table td strong { color: var(--text); }
+
+  /* ---- TAGS ---- */
+  .tag {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    margin-right: 6px;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .tag-blue { background: #5b8dee22; color: #5b8dee; border: 1px solid #5b8dee40; }
+  .tag-green { background: #43e8b022; color: #43e8b0; border: 1px solid #43e8b040; }
+  .tag-yellow { background: #f9c84622; color: #f9c846; border: 1px solid #f9c84640; }
+  .tag-red { background: #ff6b6b22; color: #ff6b6b; border: 1px solid #ff6b6b40; }
+
+  /* ---- GRID ---- */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 600px) { .two-col { grid-template-columns: 1fr; } }
+
+  /* ---- QUIZ ---- */
+  .quiz-section {
+    background: linear-gradient(135deg, #1a2a6c22, #5b8dee11);
+    border: 1px solid #5b8dee44;
+    border-radius: 14px;
+    padding: 28px;
+    margin: 40px 0;
+  }
+
+  .quiz-section h2 {
+    color: var(--accent);
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .quiz-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+    margin-bottom: 14px;
+  }
+
+  .quiz-q { font-weight: 600; font-size: 0.9rem; margin-bottom: 12px; }
+  .quiz-q span { color: var(--accent); font-family: 'Space Mono', monospace; margin-right: 8px; }
+
+  .quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  @media (max-width: 500px) { .quiz-options { grid-template-columns: 1fr; } }
+
+  .quiz-opt {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.83rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+  }
+
+  .quiz-opt:hover { border-color: var(--accent); color: var(--accent); }
+  .quiz-opt.correct { background: #43e8b022; border-color: var(--accent3); color: var(--accent3); }
+  .quiz-opt.wrong { background: #ff6b6b22; border-color: var(--accent2); color: var(--accent2); }
+
+  .quiz-explanation {
+    display: none;
+    margin-top: 12px;
+    padding: 12px;
+    background: #43e8b010;
+    border: 1px solid #43e8b030;
+    border-radius: 8px;
+    font-size: 0.83rem;
+    color: var(--muted);
+  }
+
+  .quiz-explanation.show { display: block; }
+
+  /* ---- CHEAT SHEET ---- */
+  .cheat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 12px;
+  }
+
+  .cheat-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+
+  .cheat-item .cheat-fn {
+    font-family: 'Space Mono', monospace;
+    color: var(--accent3);
+    font-size: 0.82rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .cheat-item p { font-size: 0.8rem; color: var(--muted); }
+
+  /* ---- PROGRESS ---- */
+  .progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent3));
+    z-index: 999;
+    transition: width 0.1s;
+    width: 0%;
+  }
+
+  /* ---- FOOTER ---- */
+  footer {
+    text-align: center;
+    padding: 40px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.82rem;
+  }
+
+  footer strong { color: var(--accent3); }
+
+  /* ---- DIVIDER ---- */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 40px 0;
+  }
+
+  .highlight { color: var(--accent4); font-weight: 600; }
+  .accent-text { color: var(--accent); font-weight: 600; }
+  .green-text { color: var(--accent3); font-weight: 600; }
+
+  ul.styled { list-style: none; padding: 0; }
+  ul.styled li {
+    padding: 6px 0 6px 24px;
+    position: relative;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+  ul.styled li::before {
+    content: '▸';
+    color: var(--accent);
+    position: absolute;
+    left: 0;
+  }
+  ul.styled li strong { color: var(--text); }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progress"></div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="badge">📚 Mid-Term Study Notes</div>
+  <h1>Master <span>NumPy</span><br>in One Night 🚀</h1>
+  <p>Programming for AI · Complete Lecture Notes</p>
+  <div class="author-badge">✍️ Prepared by: Syed Intisar Raza</div>
+</div>
+
+<!-- TABLE OF CONTENTS -->
+<div class="toc-container">
+  <div class="toc">
+    <h2>📋 Quick Navigation</h2>
+    <div class="toc-grid">
+      <a href="#s1"><span class="num">01</span> What is NumPy?</a>
+      <a href="#s2"><span class="num">02</span> Advantages</a>
+      <a href="#s3"><span class="num">03</span> Installation</a>
+      <a href="#s4"><span class="num">04</span> NumPy Arrays</a>
+      <a href="#s5"><span class="num">05</span> Defining Arrays</a>
+      <a href="#s6"><span class="num">06</span> Reshaping Arrays</a>
+      <a href="#s7"><span class="num">07</span> Indexing</a>
+      <a href="#s8"><span class="num">08</span> Mask Arrays</a>
+      <a href="#s9"><span class="num">09</span> Concatenation</a>
+      <a href="#s10"><span class="num">10</span> Splitting</a>
+      <a href="#s11"><span class="num">11</span> Adding/Removing</a>
+      <a href="#s12"><span class="num">12</span> Array Copy</a>
+      <a href="#s13"><span class="num">13</span> Broadcasting</a>
+      <a href="#s14"><span class="num">14</span> Vectorization</a>
+      <a href="#quiz"><span class="num">★</span> Practice Quiz</a>
+      <a href="#cheat"><span class="num">★</span> Cheat Sheet</a>
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <!-- SECTION 1 -->
+  <div class="section" id="s1">
+    <div class="section-header">
+      <div class="section-icon icon-blue">🔢</div>
+      <div>
+        <div class="section-num">SECTION 01</div>
+        <div class="section-title">What is NumPy?</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">The Basics</div>
+      <p><strong>NumPy = Numerical Python.</strong> It's an open-source library built in 2005 by Travis Oliphant. It is the <strong>most important library</strong> for working with numbers and arrays in Python. Almost every data science/AI library (like TensorFlow, Pandas) depends on it.</p>
+    </div>
+
+    <div class="tip-box tip-blue">
+      <div class="icon">💡</div>
+      <div><strong>Real Life Analogy:</strong> Think of a regular Python list like a backpack — you can put different things in it. A NumPy array is like a box of identical items (e.g., all numbers), super organized and much faster to sort through!</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Key Features NumPy Provides</div>
+      <ul class="styled">
+        <li><strong>ndarray:</strong> Multi-dimensional array (the main star of NumPy)</li>
+        <li><strong>Contiguous Memory:</strong> Data is stored in one neat block → uses <strong>much less memory</strong> than Python lists</li>
+        <li><strong>Standard Math Functions:</strong> Operate on entire arrays without writing loops</li>
+        <li><strong>Vectorization:</strong> Batch operations on data — no for-loops needed!</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SECTION 2 -->
+  <div class="section" id="s2">
+    <div class="section-header">
+      <div class="section-icon icon-green">⚡</div>
+      <div>
+        <div class="section-num">SECTION 02</div>
+        <div class="section-title">Advantages of NumPy</div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">⚡ Speed</div>
+        <p>NumPy operations can be up to <strong class="highlight">50x faster</strong> than regular Python loops! It stores elements of the same type in one memory location, using modern CPUs efficiently.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">🧮 Less Code</div>
+        <p>NumPy needs <strong>fewer lines</strong> for math operations. What takes 10 lines in Python can be done in 1 line with NumPy!</p>
+      </div>
+      <div class="card">
+        <div class="card-title">📐 Easy Indexing</div>
+        <p>Has a powerful <strong>indexing syntax</strong> to easily grab portions of arrays. Like slicing bread — but for data!</p>
+      </div>
+      <div class="card">
+        <div class="card-title">📦 Built-in Functions</div>
+        <p>Has ready-made functions for <strong>linear algebra, matrix math,</strong> and <strong>array transformations</strong> — no need to code them yourself.</p>
+      </div>
+    </div>
+
+    <div class="tip-box tip-yellow">
+      <div class="icon">🏆</div>
+      <div><strong>Exam Tip:</strong> The 50x speed advantage is due to two main reasons: (1) all elements are the same data type, and (2) data is stored in one continuous memory block.</div>
+    </div>
+  </div>
+
+  <!-- SECTION 3 -->
+  <div class="section" id="s3">
+    <div class="section-header">
+      <div class="section-icon icon-yellow">⚙️</div>
+      <div>
+        <div class="section-num">SECTION 03</div>
+        <div class="section-title">Installation</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Check if NumPy is installed</div>
+      <p>Just run this — if no error appears, you're good!</p>
+    </div>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+        <div class="code-label">Python</div>
+      </div>
+      <pre><span class="kw">import</span> numpy <span class="kw">as</span> np   <span class="cm"># 'np' is the standard alias everyone uses</span></pre>
+    </div>
+
+    <div class="card">
+      <div class="card-title">If you get ModuleNotFoundError</div>
+      <p>Install NumPy using pip in your terminal:</p>
+    </div>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+        <div class="code-label">Terminal</div>
+      </div>
+      <pre>pip install numpy</pre>
+    </div>
+  </div>
+
+  <!-- SECTION 4 -->
+  <div class="section" id="s4">
+    <div class="section-header">
+      <div class="section-icon icon-purple">📊</div>
+      <div>
+        <div class="section-num">SECTION 04</div>
+        <div class="section-title">NumPy Arrays (ndarray)</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">The 3 Types of Arrays</div>
+      <p>NumPy arrays can have multiple <strong>dimensions</strong>. Here's how to think about them:</p>
+    </div>
+
+    <table class="compare-table">
+      <tr>
+        <th>Dimension</th>
+        <th>Think of it as…</th>
+        <th>Example Shape</th>
+        <th>Code</th>
+      </tr>
+      <tr>
+        <td><span class="tag tag-blue">1D</span> Vector</td>
+        <td>A simple list of numbers</td>
+        <td><code>(3,)</code></td>
+        <td><code>np.array([1, 2, 3])</code></td>
+      </tr>
+      <tr>
+        <td><span class="tag tag-green">2D</span> Matrix</td>
+        <td>A spreadsheet / table of rows & columns</td>
+        <td><code>(2, 3)</code></td>
+        <td><code>np.array([[1,2,3],[4,5,6]])</code></td>
+      </tr>
+      <tr>
+        <td><span class="tag tag-yellow">3D</span> Tensor</td>
+        <td>A stack of spreadsheets / cube of data</td>
+        <td><code>(2, 2, 2)</code></td>
+        <td><code>np.array([[[1,2],[3,4]],[[5,6],[7,8]]])</code></td>
+      </tr>
+    </table>
+
+    <div class="card">
+      <div class="card-title">Data Types in Arrays</div>
+      <p>All elements in a NumPy array <strong>must be the same type</strong> (all ints, OR all floats, OR all strings). If you need mixed types → use <strong>Pandas DataFrames</strong> (covered in later lectures).</p>
+    </div>
+
+    <div class="tip-box tip-green">
+      <div class="icon">📌</div>
+      <div><strong>Remember:</strong> A 1D array is a <strong>vector</strong>, 2D is a <strong>matrix</strong>, 3D is a <strong>tensor</strong>. You can have even more dimensions — just hard to visualize!</div>
+    </div>
+  </div>
+
+  <!-- SECTION 5 -->
+  <div class="section" id="s5">
+    <div class="section-header">
+      <div class="section-icon icon-blue">🏗️</div>
+      <div>
+        <div class="section-num">SECTION 05</div>
+        <div class="section-title">Defining / Creating Arrays</div>
+      </div>
+    </div>
+
+    <div class="card"><div class="card-title">1️⃣ np.array() — Manual Creation</div><p>Pass a list (or list of lists) to create an array manually.</p></div>
+    <div class="code-block">
+      <div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-label">Python</div></div>
+      <pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 1D array (vector)</span>
+a = np.<span class="fn">array</span>([<span class="num-c">1</span>, <span class="num-c">2</span>, <span class="num-c">3</span>])
+
+<span class="cm"># 2D array (matrix) — list of lists</span>
+b = np.<span class="fn">array</span>([[<span class="num-c">1</span>,<span class="num-c">2</span>],[<span class="num-c">3</span>,<span class="num-c">4</span>]])
+<span class="cm"># Output: array([[1, 2], [3, 4]])</span></pre>
+    </div>
+
+    <div class="card"><div class="card-title">2️⃣ np.arange() — Range-based</div><p>Like Python's <code>range()</code> but gives a NumPy array. Creates a sequence from start to end (end NOT included).</p></div>
+    <div class="code-block">
+      <div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-label">Python</div></div>
+      <pre>np.<span class="fn">arange</span>(<span class="num-c">1</span>, <span class="num-c">5</span>)
+<span class="out"># Output: array([1, 2, 3, 4])  ← 5 is excluded!</span></pre>
+    </div>
+
+    <div class="card"><div class="card-title">3️⃣ np.zeros(), np.ones(), np.full() — Preset values</div><p>Use these when you want to initialize arrays with a specific value.</p></div>
+    <div class="code-block">
+      <div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-label">Python</div></div>
+      <pre>np.<span class="fn">zeros</span>((<span class="num-c">3</span>,<span class="num-c">1</span>))   <span class="cm"># 3 rows, 1 col, all zeros</span>
+<span class="out"># array([[0.], [0.], [0.]])</span>
+
+np.<span class="fn">ones</span>((<span class="num-c">3</span>,<span class="num-c">1</span>))    <span class="cm"># 3 rows, 1 col, all ones</span>
+<span class="out"># array([[1.], [1.], [1.]])</span>
+
+np.<span class="fn">full</span>((<span class="num-c">2</span>,<span class="num-c">3</span>), <span class="num-c">7</span>) <span class="cm"># 2×3 matrix, all filled with 7</span>
+<span class="out"># array([[7, 7, 7], [7, 7, 7]])</span></pre>
+    </div>
+
+    <div class="card"><div class="card-title">4️⃣ .shape — Check Array Dimensions</div><p>Every array has a <code>.shape</code> attribute that tells you its dimensions.</p></div>
+    <div class="code-block">
+      <div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-label">Python</div></div>
+      <pre>vector = np.<span class="fn">arange</span>(<span class="num-c">5</span>)
+<span class="fn">print</span>(vector.shape)    <span class="out"># (5,)     ← 5 elements, 1D</span>
+
+matrix = np.<span class="fn">ones</span>([<span class="num-c">3</span>, <span class="num-c">2</span>])
+<span class="fn">print</span>(matrix.shape)    <span class="out"># (3, 2)   ← 3 rows, 2 cols</span>
+
+tensor = np.<span class="fn">zeros</span>([<span class="num-c">2</span>, <span class="num-c">3</span>, <span class="num-c">3</span>])
+<span class="fn">print</span>(tensor.shape)    <span class="out"># (2, 3, 3) ← 3D tensor</span></pre>
+    </div>
+
+    <div class="tip-box tip-yellow">
+      <div class="icon">⚠️</div>
+      <div><strong>Exam Trap!</strong> <code>np.arange(1, 5)</code> gives [1, 2, 3, 4] — the end value <strong>5 is NOT included</strong>. Just like Python's range()!</div>
+    </div>
+  </div>
+
+  <!-- SECTION 6 -->
+  <div class="section" id="s6">
+    <div class="section-header">
+      <div class="section-icon icon-green">🔄</div>
+      <div>
+        <div class="section-num">SECTION 06</div>
+        <div class="section-title">Reshaping Arrays</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">What is Reshaping?</div>
+      <p>You can change the <strong>shape</strong> of an array as long as the <strong>total number of elements stays the same</strong>. 9 elements can become (3×3), (9×1), (1×9) — all valid!</p>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-label">Python</div></div>
+      <pre>arr = np.<span class="fn">arange</span>(<span class="num-c">1</span>, <span class="num-c">10</span>)
+<span class="fn">print</span>(arr)
+<span class="out"># [1 2 3 4 5 6 7 8 9]</span>
+
+arr = arr.<span class="fn">reshape</span>(<span class="num-c">3</span>, <span class="num-c">3</span>)   <span class="cm"># 9 elements → 3×3 matrix</span>
+<span class="fn">print</span>(arr)
+<span class="out"># [[1 2 3]
+#  [4 5 6]
+#  [7 8 9]]</span>
+
+arr = arr.<span class="fn">reshape</span>(<span class="num-c">9</span>)       <span class="cm"># Back to flat 1D</span>
+<span class="out"># [1 2 3 4 5 6 7 8 9]</span></pre>
+    </div>
+
+    <div class="tip-box tip-red">
+      <div class="icon">🚨</div>
+      <div><strong>Rule:</strong> Total elements must match! Can't reshape 9 elements into (4×3) because 4×3=12 ≠ 9. It will throw an error!</div>
+    </div>
+  </div>
+
+  <!-- SECTION 7 -->
+  <div class="section" id="s7">
+    <div class="section-header">
+      <div class="section-icon icon-yellow">🎯</div>
+      <div>
+        <div class="section-num">SECTION 07</div>
+        <div class="section-title">Indexing</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Indexing Rules — Learn These!</div>
+      <ul class="styled">
+        <li><strong>Commas</strong> separate axes: <code>arr[row, col]</code></li>
+        <li><strong>Colon :</strong> means "through" / "all" → <code>x[0:4]</code> = rows 0 to 3</li>
+        <li><strong>Negative index</strong> = from the end → <code>x[-1]</code> = last row</li>
+        <li><strong>Blank before colon:</strong> <code>x[:3]</code> = rows from start up to (not including) 3</li>
+        <li><strong>Blank after colon:</strong> <code>x[3:]</code> = rows from 3 to the end</li>
+        <li><strong>x[:]</strong> = ALL rows</li>
+        <li><strong>Dots (...)</strong> = as many colons as needed → <code>x[1,2,...]</code> = <code>x[1,2,:,:,:]</code></li>
+        <li><strong>Step (::2):</strong> <code>x[1::2]</code> = every other row starting from row 1</li>
+      </ul>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-label">Python — Indexing Examples</div></div>
+      <pre><span class="cm"># arr is a 4×4 matrix: [[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,16]]</span>
+
+arr[<span class="num-c">1</span>, <span class="num-c">2</span>:<span class="num-c">4</span>]   <span class="out"># Row 1, columns 2 to 3  → [7, 8]</span>
+arr[:, <span class="num-c">1</span>]     <span class="out"># ALL rows, column 1     → [2, 6, 10, 14]</span>
+arr[<span class="num-c">2</span>:, <span class="num-c">2</span>:]   <span class="out"># Rows after 2, cols after 2 → [[11,12],[15,16]]</span>
+arr[<span class="num-c">1</span>::<span class="num-c">2</span>, ::<span class="num-c">2</span>] <span class="out"># Every other row from 1, every other col → [[5,7],[13,15]]</span></pre>
+    </div>
+
+    <div class="tip-box tip-blue">
+      <div class="icon">🧠</div>
+      <div><strong>Memory Trick:</strong> Think of it as <code>[rows, columns]</code>. A colon means "all" or a range. Negative means "from the back."</div>
+    </div>
+  </div>
+
+  <!-- SECTION 8 -->
+  <div class="section" id="s8">
+    <div class="section-header">
+      <div class="section-icon icon-red">🎭</div>
+      <div>
+        <div class="section-num">SECTION 08</div>
+        <div class="section-title">Mask Arrays (Boolean Indexing)</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">What is a Mask Array?</div>
+      <p>A <strong>mask array</strong> is an array of <code>True</code> / <code>False</code> values. When you use it to index another array, only the elements corresponding to <strong>True</strong> are kept. It's like putting a filter on your data!</p>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-label">Python</div></div>
+      <pre>data = np.<span class="fn">array</span>([<span class="num-c">10</span>, <span class="num-c">20</span>, <span class="num-c">30</span>, <span class="num-c">40</span>, <span class="num-c">50</span>])
+
+mask = np.<span class="fn">array</span>([<span class="kw">False</span>, <span class="kw">True</span>, <span class="kw">False</span>, <span class="kw">True</span>, <span class="kw">True</span>])
+
+data[mask]   <span class="out"># → array([20, 40, 50])  — only True positions kept!</span>
+
+<span class="cm"># You can also create masks with conditions:</span>
+mask2 = data > <span class="num-c">25</span>   <span class="out"># → [False, False, True, True, True]</span>
+data[mask2]          <span class="out"># → array([30, 40, 50])</span></pre>
+    </div>
+  </div>
+
+  <!-- SECTION 9 -->
+  <div class="section" id="s9">
+    <div class="section-header">
+      <div class="section-icon icon-blue">🔗</div>
+      <div>
+        <div class="section-num">SECTION 09</div>
+        <div class="section-title">Concatenation (Joining Arrays)</div>
+      </div>
+    </div>
+
+    <table class="compare-table">
+      <tr>
+        <th>Function</th>
+        <th>Direction</th>
+        <th>What it does</th>
+      </tr>
+      <tr>
+        <td><code>np.vstack()</code></td>
+        <td>Vertical (row-wise)</td>
+        <td>Stacks arrays on top of each other</td>
+      </tr>
+      <tr>
+        <td><code>np.hstack()</code></td>
+        <td>Horizontal (column-wise)</td>
+        <td>Stacks arrays side by side</td>
+      </tr>
+      <tr>
+        <td><code>np.concatenate()</code></td>
+        <td>Any axis</td>
+        <td>General-purpose; specify axis=0 (rows) or axis=1 (cols)</td>
+      </tr>
+    </table>
+
+    <div class="code-block">
+      <div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-label">Python</div></div>
+      <pre>a = np.<span class="fn">array</span>([[<span class="num-c">1</span>,<span class="num-c">2</span>],[<span class="num-c">3</span>,<span class="num-c">4</span>]])
+b = np.<span class="fn">array</span>([[<span class="num-c">5</span>,<span class="num-c">6</span>],[<span class="num-c">7</span>,<span class="num-c">8</span>]])
+
+np.<span class="fn">vstack</span>((a, b))          <span class="out"># [[1,2],[3,4],[5,6],[7,8]] — stacked rows</span>
+np.<span class="fn">hstack</span>((a, b))          <span class="out"># [[1,2,5,6],[3,4,7,8]] — stacked columns</span>
+np.<span class="fn">concatenate</span>((a,b), axis=<span class="num-c">0</span>)  <span class="cm"># Same as vstack</span>
+np.<span class="fn">concatenate</span>((a,b), axis=<span class="num-c">1</span>)  <span class="cm"># Same as hstack</span></pre>
+    </div>
+
+    <div class="tip-box tip-green">
+      <div class="icon">💡</div>
+      <div><strong>Memory trick:</strong> <strong>V</strong>stack = <strong>V</strong>ertical = adding more <strong>rows</strong>. <strong>H</strong>stack = <strong>H</strong>orizontal = adding more <strong>columns</strong>.</div>
+    </div>
+  </div>
+
+  <!-- SECTION 10 -->
+  <div class="section" id="s10">
+    <div class="section-header">
+      <div class="section-icon icon-red">✂️</div>
+      <div>
+        <div class="section-num">SECTION 10</div>
+        <div class="section-title">Splitting Arrays</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Splitting = Opposite of Concatenation</div>
+      <ul class="styled">
+        <li><strong>hsplit():</strong> Split horizontally (along columns)</li>
+        <li><strong>vsplit():</strong> Split vertically (along rows)</li>
+        <li><strong>dsplit():</strong> Split along the 3rd axis (depth) — for 3D arrays</li>
+        <li><strong>array_split():</strong> Most flexible — you specify which axis to split on</li>
+      </ul>
+    </div>
+
+    <div class="tip-box tip-yellow">
+      <div class="icon">📝</div>
+      <div><strong>Exam Note:</strong> <code>dsplit</code> = depth split = 3rd axis. This is specifically for 3D arrays!</div>
+    </div>
+  </div>
+
+  <!-- SECTION 11 -->
+  <div class="section" id="s11">
+    <div class="section-header">
+      <div class="section-icon icon-green">➕</div>
+      <div>
+        <div class="section-num">SECTION 11</div>
+        <div class="section-title">Adding / Removing Elements</div>
+      </div>
+    </div>
+
+    <table class="compare-table">
+      <tr>
+        <th>Function</th>
+        <th>What it does</th>
+        <th>Example Use</th>
+      </tr>
+      <tr>
+        <td><strong>resize</strong></td>
+        <td>Returns new array with given shape; fills new cells with zeros</td>
+        <td>Expand array to larger size</td>
+      </tr>
+      <tr>
+        <td><strong>append</strong></td>
+        <td>Adds values to the END of an array</td>
+        <td>Add new data at end</td>
+      </tr>
+      <tr>
+        <td><strong>insert</strong></td>
+        <td>Adds values in the MIDDLE of an array</td>
+        <td>Add data at a specific position</td>
+      </tr>
+      <tr>
+        <td><strong>delete</strong></td>
+        <td>Returns new array with given data removed</td>
+        <td>Remove unwanted rows/cols</td>
+      </tr>
+      <tr>
+        <td><strong>unique</strong></td>
+        <td>Finds only the UNIQUE values (removes duplicates)</td>
+        <td>Get distinct values from data</td>
+      </tr>
+    </table>
+
+    <div class="card"><div class="card-title">Sorting</div><p>NumPy supports multiple sorting algorithms: <strong>quicksort, heapsort, mergesort, timesort</strong>. You can sort along any axis.</p></div>
+    <div class="code-block">
+      <div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-label">Python</div></div>
+      <pre>a = np.<span class="fn">array</span>([[<span class="num-c">3</span>,<span class="num-c">8</span>,<span class="num-c">1</span>,<span class="num-c">2</span>], [<span class="num-c">9</span>,<span class="num-c">5</span>,<span class="num-c">4</span>,<span class="num-c">8</span>]])
+np.<span class="fn">sort</span>(a, axis=<span class="num-c">1</span>, kind=<span class="str">'mergesort'</span>)
+<span class="out"># Sorts each row: [[1,2,3,8],[4,5,8,9]]</span></pre>
+    </div>
+  </div>
+
+  <!-- SECTION 12 -->
+  <div class="section" id="s12">
+    <div class="section-header">
+      <div class="section-icon icon-purple">📋</div>
+      <div>
+        <div class="section-num">SECTION 12</div>
+        <div class="section-title">Array Copy (Very Important!)</div>
+      </div>
+    </div>
+
+    <div class="tip-box tip-red">
+      <div class="icon">🚨</div>
+      <div><strong>This is a classic exam/quiz topic!</strong> Understanding when data is copied vs. shared is crucial.</div>
+    </div>
+
+    <table class="compare-table">
+      <tr>
+        <th>Type</th>
+        <th>Code</th>
+        <th>Data Copied?</th>
+        <th>Changing one affects other?</th>
+      </tr>
+      <tr>
+        <td><span class="tag tag-red">No Copy</span></td>
+        <td><code>b = a</code></td>
+        <td>❌ No</td>
+        <td>✅ Yes — b IS a</td>
+      </tr>
+      <tr>
+        <td><span class="tag tag-yellow">Shallow/View</span></td>
+        <td><code>b = a.view()</code> or slicing</td>
+        <td>⚠️ Partial</td>
+        <td>✅ Yes — shares data</td>
+      </tr>
+      <tr>
+        <td><span class="tag tag-green">Deep Copy</span></td>
+        <td><code>c = a.copy()</code></td>
+        <td>✅ Full copy</td>
+        <td>❌ No — completely independent</td>
+      </tr>
+    </table>
+
+    <div class="code-block">
+      <div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-label">Python</div></div>
+      <pre>a = np.<span class="fn">array</span>([<span class="num-c">1</span>, <span class="num-c">2</span>, <span class="num-c">3</span>])
+
+b = a           <span class="cm"># NO COPY — b and a point to same object</span>
+b = a.<span class="fn">view</span>()   <span class="cm"># SHALLOW COPY — same data, different object</span>
+c = a.<span class="fn">copy</span>()  <span class="cm"># DEEP COPY — completely new, independent copy</span>
+
+<span class="cm"># Slicing also creates a VIEW (not a copy!):</span>
+s = a[<span class="num-c">0</span>:<span class="num-c">2</span>]   <span class="cm"># s is a VIEW of a</span></pre>
+    </div>
+
+    <div class="tip-box tip-blue">
+      <div class="icon">💡</div>
+      <div><strong>Analogy:</strong> "No copy" is like two people sharing the same Google Doc — any change one makes, the other sees. "Deep copy" is like printing a separate copy — your edits don't affect the original!</div>
+    </div>
+  </div>
+
+  <!-- SECTION 13 -->
+  <div class="section" id="s13">
+    <div class="section-header">
+      <div class="section-icon icon-yellow">📡</div>
+      <div>
+        <div class="section-num">SECTION 13</div>
+        <div class="section-title">Broadcasting</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">What is Broadcasting?</div>
+      <p>Broadcasting lets NumPy perform math operations on arrays with <strong>different shapes</strong> that wouldn't normally be compatible. NumPy automatically "stretches" the smaller array to match the bigger one — <strong>without actually copying the data</strong> (super efficient!).</p>
+    </div>
+
+    <div class="card"><div class="card-title">Example 1: Scalar + Matrix</div></div>
+    <div class="code-block">
+      <div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-label">Python</div></div>
+      <pre>a = np.<span class="fn">array</span>([[<span class="num-c">1</span>,<span class="num-c">2</span>],[<span class="num-c">3</span>,<span class="num-c">4</span>]])
+
+a + <span class="num-c">1</span>   <span class="out"># Broadcasts 1 to all elements</span>
+<span class="out"># → array([[2, 3], [4, 5]])</span>
+
+a * <span class="num-c">2</span>   <span class="out"># Broadcasts 2</span>
+<span class="out"># → array([[2, 4], [6, 8]])</span></pre>
+    </div>
+
+    <div class="card"><div class="card-title">Example 2: Vector + Matrix</div></div>
+    <div class="code-block">
+      <div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-label">Python</div></div>
+      <pre>a = np.<span class="fn">array</span>([[<span class="num-c">1</span>,<span class="num-c">2</span>],[<span class="num-c">3</span>,<span class="num-c">4</span>]])  <span class="cm"># 2×2</span>
+v = np.<span class="fn">array</span>([<span class="num-c">3</span>, <span class="num-c">1</span>])          <span class="cm"># 1×2 — broadcast to 2×2</span>
+
+a + v
+<span class="out"># NumPy stretches [3,1] to [[3,1],[3,1]] then adds</span>
+<span class="out"># → array([[4, 3], [6, 5]])</span></pre>
+    </div>
+
+    <div class="tip-box tip-yellow">
+      <div class="icon">⚠️</div>
+      <div><strong>Important note from lecture:</strong> Adding a scalar to a matrix is NOT valid in traditional linear algebra (your math professor would hate it!), but NumPy handles it by broadcasting — <strong>creating a virtual array of the scalar value</strong> behind the scenes.</div>
+    </div>
+  </div>
+
+  <!-- SECTION 14 -->
+  <div class="section" id="s14">
+    <div class="section-header">
+      <div class="section-icon icon-blue">🏎️</div>
+      <div>
+        <div class="section-num">SECTION 14</div>
+        <div class="section-title">Vectorization</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">What is Vectorization?</div>
+      <p>Vectorization = replacing Python loops with <strong>NumPy array operations</strong>. This makes code run <strong>much faster</strong> because NumPy uses a lower-level (compiled) language internally. It's one of the <strong>most important concepts</strong> for machine learning!</p>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">❌ Non-Vectorized (Slow)</div>
+        <div class="code-block" style="margin-top:10px;">
+          <pre style="font-size:0.75rem;"><span class="kw">def</span> <span class="fn">multiply_slow</span>(a, b):
+  output = []
+  <span class="kw">for</span> j <span class="kw">in</span> <span class="fn">range</span>(<span class="fn">len</span>(a)):
+    output.<span class="fn">append</span>(a[j]*b[j])
+  <span class="kw">return</span> output
+<span class="out"># Speed: ~21.4 µs</span></pre>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">✅ Vectorized (Fast!)</div>
+        <div class="code-block" style="margin-top:10px;">
+          <pre style="font-size:0.75rem;"><span class="kw">def</span> <span class="fn">multiply_fast</span>(a, b):
+  <span class="kw">return</span> a * b   <span class="cm"># That's it!</span>
+
+
+
+<span class="out"># Speed: ~701 ns  (~30x faster!)</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="tip-box tip-green">
+      <div class="icon">🏆</div>
+      <div>
+        <strong>Benefits of Vectorization:</strong><br>
+        1. <strong>Speed</strong> — Much faster execution (crucial for ML with large datasets)<br>
+        2. <strong>Compact Code</strong> — Fewer lines = less chance of bugs<br>
+        3. <strong>Readability</strong> — Easier to understand at a glance
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">File I/O: Reading & Saving</div>
+      <p>Read CSV files using Python's csv module + convert to NumPy. Save arrays with <code>np.save()</code> → creates a <code>.npy</code> binary file.</p>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-label">Python</div></div>
+      <pre><span class="kw">import</span> csv, numpy <span class="kw">as</span> np
+data = []
+<span class="kw">with</span> <span class="fn">open</span>(<span class="str">'file.csv'</span>, <span class="str">'r'</span>) <span class="kw">as</span> f:
+  reader = csv.<span class="fn">reader</span>(f)
+  <span class="kw">for</span> row <span class="kw">in</span> reader:
+    data.<span class="fn">append</span>(row)
+data = np.<span class="fn">array</span>(data)   <span class="cm"># Convert list → NumPy array</span>
+
+<span class="cm"># Save to .npy file:</span>
+np.<span class="fn">save</span>(<span class="fn">open</span>(<span class="str">'data.npy'</span>, <span class="str">'wb'</span>), data)</pre>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- QUIZ -->
+  <div class="quiz-section" id="quiz">
+    <h2>🎯 Practice Quiz — Test Yourself!</h2>
+
+    <div class="quiz-item" id="q1">
+      <div class="quiz-q"><span>Q1.</span> What does <code>np.arange(2, 6)</code> return?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="checkAnswer('q1', this, false)">[2, 3, 4, 5, 6]</button>
+        <button class="quiz-opt" onclick="checkAnswer('q1', this, true)">[2, 3, 4, 5]</button>
+        <button class="quiz-opt" onclick="checkAnswer('q1', this, false)">[2, 4, 6]</button>
+        <button class="quiz-opt" onclick="checkAnswer('q1', this, false)">[3, 4, 5, 6]</button>
+      </div>
+      <div class="quiz-explanation" id="q1-exp">✅ <strong>Correct!</strong> <code>np.arange(start, stop)</code> includes start but EXCLUDES stop. So 6 is not included.</div>
+    </div>
+
+    <div class="quiz-item" id="q2">
+      <div class="quiz-q"><span>Q2.</span> NumPy operations can be up to how many times faster than Python loops?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="checkAnswer('q2', this, false)">10x faster</button>
+        <button class="quiz-opt" onclick="checkAnswer('q2', this, true)">50x faster</button>
+        <button class="quiz-opt" onclick="checkAnswer('q2', this, false)">100x faster</button>
+        <button class="quiz-opt" onclick="checkAnswer('q2', this, false)">5x faster</button>
+      </div>
+      <div class="quiz-explanation" id="q2-exp">✅ <strong>Correct!</strong> The lecture specifically states up to <strong>50x faster</strong> — remember this number!</div>
+    </div>
+
+    <div class="quiz-item" id="q3">
+      <div class="quiz-q"><span>Q3.</span> Which function creates a complete, independent copy of an array?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="checkAnswer('q3', this, false)">a.view()</button>
+        <button class="quiz-opt" onclick="checkAnswer('q3', this, false)">b = a</button>
+        <button class="quiz-opt" onclick="checkAnswer('q3', this, true)">a.copy()</button>
+        <button class="quiz-opt" onclick="checkAnswer('q3', this, false)">a[:]</button>
+      </div>
+      <div class="quiz-explanation" id="q3-exp">✅ <strong>Correct!</strong> <code>a.copy()</code> is the deep copy. <code>view()</code> and slices are shallow copies (views). <code>b = a</code> is no copy at all.</div>
+    </div>
+
+    <div class="quiz-item" id="q4">
+      <div class="quiz-q"><span>Q4.</span> What is the shape of <code>np.zeros((3, 1))</code>?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="checkAnswer('q4', this, false)">(1, 3)</button>
+        <button class="quiz-opt" onclick="checkAnswer('q4', this, false)">(3,)</button>
+        <button class="quiz-opt" onclick="checkAnswer('q4', this, true)">(3, 1)</button>
+        <button class="quiz-opt" onclick="checkAnswer('q4', this, false)">(1,)</button>
+      </div>
+      <div class="quiz-explanation" id="q4-exp">✅ <strong>Correct!</strong> <code>np.zeros((3, 1))</code> creates 3 rows and 1 column — shape is (3, 1).</div>
+    </div>
+
+    <div class="quiz-item" id="q5">
+      <div class="quiz-q"><span>Q5.</span> What does <code>np.vstack()</code> do?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="checkAnswer('q5', this, false)">Joins arrays side by side (columns)</button>
+        <button class="quiz-opt" onclick="checkAnswer('q5', this, true)">Stacks arrays on top of each other (rows)</button>
+        <button class="quiz-opt" onclick="checkAnswer('q5', this, false)">Splits an array vertically</button>
+        <button class="quiz-opt" onclick="checkAnswer('q5', this, false)">Reshapes an array</button>
+      </div>
+      <div class="quiz-explanation" id="q5-exp">✅ <strong>Correct!</strong> vstack = vertical stacking = adding more rows. hstack = horizontal = adding more columns.</div>
+    </div>
+
+    <div class="quiz-item" id="q6">
+      <div class="quiz-q"><span>Q6.</span> What is Broadcasting in NumPy?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="checkAnswer('q6', this, false)">A way to split arrays</button>
+        <button class="quiz-opt" onclick="checkAnswer('q6', this, false)">A sorting algorithm</button>
+        <button class="quiz-opt" onclick="checkAnswer('q6', this, true)">Operations on arrays with mismatched dimensions by virtually stretching the smaller array</button>
+        <button class="quiz-opt" onclick="checkAnswer('q6', this, false)">Making a deep copy of an array</button>
+      </div>
+      <div class="quiz-explanation" id="q6-exp">✅ <strong>Correct!</strong> Broadcasting allows math ops on incompatible shapes by "virtually" expanding the smaller array — without actually copying data.</div>
+    </div>
+
+    <div class="quiz-item" id="q7">
+      <div class="quiz-q"><span>Q7.</span> A mask array contains what type of values?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="checkAnswer('q7', this, false)">Integers (0 and 1)</button>
+        <button class="quiz-opt" onclick="checkAnswer('q7', this, true)">Boolean (True / False)</button>
+        <button class="quiz-opt" onclick="checkAnswer('q7', this, false)">Floats</button>
+        <button class="quiz-opt" onclick="checkAnswer('q7', this, false)">Strings</button>
+      </div>
+      <div class="quiz-explanation" id="q7-exp">✅ <strong>Correct!</strong> Mask arrays (logical arrays) contain True/False values. True = keep, False = exclude.</div>
+    </div>
+
+    <div class="quiz-item" id="q8">
+      <div class="quiz-q"><span>Q8.</span> What year was NumPy developed, and by whom?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="checkAnswer('q8', this, false)">2010 by Guido van Rossum</button>
+        <button class="quiz-opt" onclick="checkAnswer('q8', this, true)">2005 by Travis Oliphant</button>
+        <button class="quiz-opt" onclick="checkAnswer('q8', this, false)">2000 by Linus Torvalds</button>
+        <button class="quiz-opt" onclick="checkAnswer('q8', this, false)">2015 by Google</button>
+      </div>
+      <div class="quiz-explanation" id="q8-exp">✅ <strong>Correct!</strong> NumPy was developed in 2005 by Travis Oliphant. The name stands for Numerical Python.</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- CHEAT SHEET -->
+  <div class="section" id="cheat">
+    <div class="section-header">
+      <div class="section-icon icon-green">📄</div>
+      <div>
+        <div class="section-num">BONUS</div>
+        <div class="section-title">⚡ Quick Cheat Sheet</div>
+      </div>
+    </div>
+
+    <div class="cheat-grid">
+      <div class="cheat-item"><div class="cheat-fn">np.array([...])</div><p>Create array manually</p></div>
+      <div class="cheat-item"><div class="cheat-fn">np.arange(start, stop)</div><p>Range array (stop excluded)</p></div>
+      <div class="cheat-item"><div class="cheat-fn">np.zeros((r, c))</div><p>All-zero array, r×c</p></div>
+      <div class="cheat-item"><div class="cheat-fn">np.ones((r, c))</div><p>All-one array, r×c</p></div>
+      <div class="cheat-item"><div class="cheat-fn">np.full((r, c), v)</div><p>Array filled with value v</p></div>
+      <div class="cheat-item"><div class="cheat-fn">arr.shape</div><p>Returns dimensions tuple</p></div>
+      <div class="cheat-item"><div class="cheat-fn">arr.reshape(r, c)</div><p>Change shape (same total elements)</p></div>
+      <div class="cheat-item"><div class="cheat-fn">arr[row, col]</div><p>Access element at row, col</p></div>
+      <div class="cheat-item"><div class="cheat-fn">arr[2:, 1:]</div><p>Rows from 2, cols from 1</p></div>
+      <div class="cheat-item"><div class="cheat-fn">arr[mask]</div><p>Boolean mask indexing</p></div>
+      <div class="cheat-item"><div class="cheat-fn">np.vstack((a, b))</div><p>Stack rows (vertical)</p></div>
+      <div class="cheat-item"><div class="cheat-fn">np.hstack((a, b))</div><p>Stack columns (horizontal)</p></div>
+      <div class="cheat-item"><div class="cheat-fn">np.concatenate((a,b), axis=0)</div><p>Flexible join on any axis</p></div>
+      <div class="cheat-item"><div class="cheat-fn">np.sort(a, axis, kind)</div><p>Sort array along axis</p></div>
+      <div class="cheat-item"><div class="cheat-fn">a.copy()</div><p>Deep copy (independent)</p></div>
+      <div class="cheat-item"><div class="cheat-fn">a.view()</div><p>Shallow copy (shared data)</p></div>
+      <div class="cheat-item"><div class="cheat-fn">np.save('f.npy', arr)</div><p>Save array to file</p></div>
+      <div class="cheat-item"><div class="cheat-fn">a * b (vectorized)</div><p>Element-wise multiply (fast!)</p></div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <p>📚 NumPy Study Notes · Programming for AI</p>
+  <p style="margin-top:8px;">Prepared with ❤️ by <strong>Syed Intisar Raza</strong></p>
+  <p style="margin-top:6px; font-size: 0.75rem;">Good luck on your midterm! You've got this 🚀</p>
+</footer>
+
+<script>
+  // Progress bar
+  window.addEventListener('scroll', () => {
+    const bar = document.getElementById('progress');
+    const scrolled = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
+    bar.style.width = scrolled + '%';
+  });
+
+  // Quiz logic
+  function checkAnswer(qId, btn, isCorrect) {
+    const qEl = document.getElementById(qId);
+    const opts = qEl.querySelectorAll('.quiz-opt');
+    const exp = document.getElementById(qId + '-exp');
+
+    // Disable all buttons
+    opts.forEach(o => { o.disabled = true; o.style.cursor = 'default'; });
+
+    if (isCorrect) {
+      btn.classList.add('correct');
+    } else {
+      btn.classList.add('wrong');
+      // Highlight the correct one
+      opts.forEach(o => {
+        if (o.onclick.toString().includes('true')) {
+          o.classList.add('correct');
+        }
+      });
+    }
+
+    exp.classList.add('show');
+  }
+</script>
+</body>
+</html>
